@@ -107,19 +107,21 @@ python -m http.server 3000
 
 
 🎯 Key Features Breakdown
-[x] Autonomous Geocoding: Infers exact latitude/longitude coordinates directly from regional place names.
 
-[x] Dynamic Heatmap Generation: Generates synthetic geospatial dispersion patterns around the crisis epicenter.
+[ ] Autonomous Geocoding: Infers exact latitude/longitude coordinates directly from regional place names.
 
-[x] NDMA-Compliant Triage Directives: Categorizes operational procedures into standardized Immediate, Short-Term, and Recovery phases.
+[ ] Dynamic Heatmap Generation: Generates synthetic geospatial dispersion patterns around the crisis epicenter.
 
-[x] High-Contrast Dark Command UI: Purpose-built for low-light Emergency Operations Centers (EOCs).
+[ ] NDMA-Compliant Triage Directives: Categorizes operational procedures into standardized Immediate, Short-Term, and Recovery phases.
 
-[x] State-Specific Emergency Routing: Dynamically supplies verified state-level emergency dispatch numbers.
----
+[ ] High-Contrast Dark Command UI: Purpose-built for low-light Emergency Operations Centers (EOCs).
+
+[ ] State-Specific Emergency Routing: Dynamically supplies verified state-level emergency dispatch numbers.
+
 
 
 🔮 Roadmap / Future Scope
+
 [ ] Satellite Raster Ingestion: Direct integration with Copernicus / Sentinel-2 open API for automated optical damage assessment.
 
 [ ] Decentralized Mesh Sync: Offline sync using WebRTC/LoRaWAN for field coordinators in zero-connectivity zones.
@@ -127,8 +129,10 @@ python -m http.server 3000
 [ ] Automated PDF SITREP Export: One-click dispatch brief generator for field commanders.
 
 👥 Team
-Built in an overnight sprint for the 2026 Open Innovation Hackathon[cite: 1].
+
+Built in an overnight sprint for the 2026 Craft N Code Hackathon.
+Team Name: Team Name
+Members: Alakh, Karthik, Pranshu, Tanmay
 
 Repository: github.com/tonyadhikary/livecrisis_dashboard
 
-[cite: 1]
