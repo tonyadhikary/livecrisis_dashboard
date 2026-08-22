@@ -17,10 +17,10 @@ CORS(app)
 api_key = os.getenv("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
-else:
+else:  #error handling if the API key is not found
     print("WARNING: GEMINI_API_KEY not found in environment variables.")
 
-def clean_gemini_response(text):
+def clean_gemini_response(text):    #for cleaner response from Gemini API
     text = re.sub(r'```json\s*', '', text)
     text = re.sub(r'```\s*', '', text)
     text = text.strip()
@@ -39,7 +39,7 @@ def analyze():
 
     if not scenario:
         return jsonify({"error": "Scenario is required"}), 400
-
+# prompt is india specific for now, will deal later if need to change to global
     # Setup the prompt to send to Gemini
     prompt = f"""You are a disaster response AI assistant for India. Given the following disaster scenario, return ONLY a valid JSON object with no additional text, no markdown, no code blocks, no backticks. Just raw JSON.
 
