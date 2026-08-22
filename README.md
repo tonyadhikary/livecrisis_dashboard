@@ -83,7 +83,7 @@ A coordinator inputs an unstructured incident scenario, and the engine dynamical
         ├── requirements.txt    # Python dependencies
         ├── .env.example        # Environment variable template
         └── README.md           # Backend-specific instructions
-[cite: 1]
+
 ### 1. Start the Flask Backend
 ```
  bash
@@ -107,24 +107,24 @@ python -m http.server 3000
 
 
 🎯 Key Features Breakdown
-[x] Autonomous Geocoding: Infers exact latitude/longitude coordinates directly from regional place names[cite: 1].
+[x] Autonomous Geocoding: Infers exact latitude/longitude coordinates directly from regional place names.
 
-[x] Dynamic Heatmap Generation: Generates synthetic geospatial dispersion patterns around the crisis epicenter[cite: 1].
+[x] Dynamic Heatmap Generation: Generates synthetic geospatial dispersion patterns around the crisis epicenter.
 
-[x] NDMA-Compliant Triage Directives: Categorizes operational procedures into standardized Immediate, Short-Term, and Recovery phases[cite: 1].
+[x] NDMA-Compliant Triage Directives: Categorizes operational procedures into standardized Immediate, Short-Term, and Recovery phases.
 
-[x] High-Contrast Dark Command UI: Purpose-built for low-light Emergency Operations Centers (EOCs)[cite: 1].
+[x] High-Contrast Dark Command UI: Purpose-built for low-light Emergency Operations Centers (EOCs).
 
-[x] State-Specific Emergency Routing: Dynamically supplies verified state-level emergency dispatch numbers[cite: 1].
+[x] State-Specific Emergency Routing: Dynamically supplies verified state-level emergency dispatch numbers.
 ---
 
 
 🔮 Roadmap / Future Scope
-[ ] Satellite Raster Ingestion: Direct integration with Copernicus / Sentinel-2 open API for automated optical damage assessment[cite: 1].
+[ ] Satellite Raster Ingestion: Direct integration with Copernicus / Sentinel-2 open API for automated optical damage assessment.
 
-[ ] Decentralized Mesh Sync: Offline sync using WebRTC/LoRaWAN for field coordinators in zero-connectivity zones[cite: 1].
+[ ] Decentralized Mesh Sync: Offline sync using WebRTC/LoRaWAN for field coordinators in zero-connectivity zones.
 
-[ ] Automated PDF SITREP Export: One-click dispatch brief generator for field commanders[cite: 1].
+[ ] Automated PDF SITREP Export: One-click dispatch brief generator for field commanders.
 
 👥 Team
 Built in an overnight sprint for the 2026 Open Innovation Hackathon[cite: 1].
