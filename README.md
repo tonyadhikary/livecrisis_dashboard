@@ -131,7 +131,9 @@ python -m http.server 3000
 👥 Team
 
 Built in an overnight sprint for the 2026 Craft N Code Hackathon.
+
 Team Name: Team Name
+
 Members: Alakh, Karthik, Pranshu, Tanmay
 
 Repository: github.com/tonyadhikary/livecrisis_dashboard
