@@ -63,35 +63,28 @@
 
         <!-- RIGHT COLUMN: METRICS & ACTIONS -->
         <div class="col-lg-5">
+            <!-- Key Metrics (Population & Response Time) -->
+            <div class="row mb-3">
+                <div class="col-6">
+                    <div class="metric-box">
+                        <div class="text-muted small">PEOPLE AFFECTED</div>
+                        <div id="val-population" class="metric-value" style="color: #ff7b72;">--</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="metric-box">
+                        <div class="text-muted small">EST. RESPONSE TIME</div>
+                        <div id="val-response-time" class="metric-value" style="color: #58a6ff;">--</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Resource Metrics -->
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title text-light">Resource Requirements</h5>
-                    <div class="row mt-3">
-                        <div class="col-6 mb-3">
-                            <div class="metric-box">
-                                <div class="text-muted small">BLOOD UNITS</div>
-                                <div id="val-blood" class="metric-value">--</div>
-                            </div>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <div class="metric-box">
-                                <div class="text-muted small">TEMP SHELTERS</div>
-                                <div id="val-shelter" class="metric-value">--</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="metric-box">
-                                <div class="text-muted small">S&R TEAMS</div>
-                                <div id="val-teams" class="metric-value">--</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="metric-box">
-                                <div class="text-muted small">MEDEVAC CHOPPERS</div>
-                                <div id="val-choppers" class="metric-value">--</div>
-                            </div>
-                        </div>
+                    <div id="resources-container" class="row mt-3">
+                        <div class="col-12 text-muted text-center py-3">Awaiting simulation...</div>
                     </div>
                 </div>
             </div>
@@ -109,6 +102,27 @@
                         
                         <strong class="text-info">Recovery (12-72 hrs)</strong>
                         <ul id="list-recovery" class="text-light"><li>Awaiting simulation...</li></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Situation Report Panel -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title text-light mb-0">Situation Report</h5>
+                        <small id="sitrep-timestamp" class="text-muted small"></small>
+                    </div>
+                    <p id="sitrep-text" style="font-family: monospace; white-space: pre-wrap; font-size: 0.9rem;" class="text-light-50 bg-dark p-3 rounded border border-secondary border-opacity-25 mb-0">Awaiting simulation...</p>
+                </div>
+            </div>
+
+            <!-- Emergency Contacts Panel -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-light mb-3">Emergency Contacts</h5>
+                    <div id="contacts-container" class="d-flex flex-column gap-2">
+                        <div class="text-muted small text-center py-2">Awaiting simulation...</div>
                     </div>
                 </div>
             </div>
@@ -145,7 +159,7 @@
         try {
             // --- THE FETCH CALL TO YOUR FLASK BACKEND ---
             // Ensure your Flask app is running and CORS is enabled!
-            const response = await fetch('http://127.0.0.1:5000/api/generate', {
+            const response = await fetch('http://127.0.0.1:5000/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ scenario: input })
@@ -177,21 +191,89 @@
         else if(data.severity_level === "ORANGE") { banner.style.backgroundColor = "#d29922"; banner.style.color = "#000"; }
         else { banner.style.backgroundColor = "#3fb950"; banner.style.color = "#fff"; }
 
-        // Update Metrics
-        document.getElementById('val-blood').innerText = data.resources.blood.toLocaleString();
-        document.getElementById('val-shelter').innerText = data.resources.shelters.toLocaleString();
-        document.getElementById('val-teams').innerText = data.resources.ndrf_teams;
-        document.getElementById('val-choppers').innerText = data.resources.medevac;
+        // Update Key Metrics (Population & Response Time)
+        document.getElementById('val-population').innerText = (data.population_affected || 0).toLocaleString();
+        document.getElementById('val-response-time').innerText = data.estimated_response_time || "N/A";
+
+        // Update Dynamic Resources Requirements
+        const resourcesContainer = document.getElementById('resources-container');
+        resourcesContainer.innerHTML = '';
+        if (data.resources && data.resources.length > 0) {
+            data.resources.forEach(res => {
+                const col = document.createElement('div');
+                col.className = 'col-6 mb-3';
+                col.innerHTML = `
+                    <div class="metric-box">
+                        <div class="text-muted small">${res.type.toUpperCase()}</div>
+                        <div class="metric-value">${res.quantity.toLocaleString()}<span style="font-size: 0.95rem; font-weight: normal; margin-left: 4px; color: #8b949e;">${res.unit || ''}</span></div>
+                    </div>
+                `;
+                resourcesContainer.appendChild(col);
+            });
+        } else {
+            resourcesContainer.innerHTML = '<div class="col-12 text-muted text-center">No resource requirements generated.</div>';
+        }
 
         // Helper function to update the lists
         const populateList = (elementId, array) => {
             const ul = document.getElementById(elementId);
             ul.innerHTML = '';
-            array.forEach(item => { ul.innerHTML += `<li>${item}</li>`; });
+            if (array && array.length > 0) {
+                array.forEach(item => { ul.innerHTML += `<li>${item}</li>`; });
+            } else {
+                ul.innerHTML = '<li>None</li>';
+            }
         };
         populateList('list-immediate', data.ndma_phases.immediate);
         populateList('list-short', data.ndma_phases.short_term);
         populateList('list-recovery', data.ndma_phases.recovery);
+
+        // Update Situation Report
+        const now = new Date();
+        document.getElementById('sitrep-timestamp').innerText = now.toLocaleTimeString() + ' ' + now.toLocaleDateString();
+        document.getElementById('sitrep-text').innerText = data.situation_report || "No report available.";
+
+        // Update Emergency Contacts
+        const contactsContainer = document.getElementById('contacts-container');
+        contactsContainer.innerHTML = '';
+        if (data.emergency_contacts && data.emergency_contacts.length > 0) {
+            data.emergency_contacts.forEach(contact => {
+                const row = document.createElement('div');
+                row.className = 'd-flex align-items-center justify-content-between p-2 rounded border border-secondary border-opacity-25 bg-dark';
+                
+                // Determine badge background and color
+                const cat = (contact.category || '').toLowerCase().trim();
+                let badgeStyle = '';
+                if (cat === 'disaster response') {
+                    badgeStyle = 'background-color: #ff7b72; color: #0d1117;';
+                } else if (cat === 'medical') {
+                    badgeStyle = 'background-color: #3fb950; color: #0d1117;';
+                } else if (cat === 'emergency') {
+                    badgeStyle = 'background-color: #d29922; color: #0d1117;';
+                } else {
+                    badgeStyle = 'background-color: #8b949e; color: #0d1117;';
+                }
+                
+                row.innerHTML = `
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge px-2 py-1" style="${badgeStyle} font-size: 0.75rem; text-transform: uppercase;">${contact.category || 'General'}</span>
+                        <div>
+                            <strong class="d-block text-light" style="font-size: 0.9rem;">${contact.name}</strong>
+                            <span class="text-muted small">${contact.number}</span>
+                        </div>
+                    </div>
+                    <a href="tel:${contact.number}" class="btn btn-sm btn-success px-3 d-flex align-items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-telephone-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
+                        </svg>
+                        Call
+                    </a>
+                `;
+                contactsContainer.appendChild(row);
+            });
+        } else {
+            contactsContainer.innerHTML = '<div class="text-muted small text-center py-2">No emergency contacts listed</div>';
+        }
 
         // Update Map
         updateMap(data.incident_location, data.map_pins);
