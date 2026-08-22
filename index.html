@@ -11,124 +11,590 @@
     <!-- Leaflet CSS for the map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Custom tweaks to make it look cool */
-        body { background-color: #0d1117; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        .card { background-color: #161b22; border: 1px solid #30363d; margin-bottom: 1rem; }
-        #map { height: 500px; border-radius: 5px; border: 1px solid #30363d; }
-        .metric-box { text-align: center; padding: 15px; background: #21262d; border-radius: 8px; border: 1px solid #30363d; }
-        .metric-value { font-size: 2rem; font-weight: bold; color: #58a6ff; }
-        .severity-banner { display: none; text-align: center; padding: 10px; font-weight: bold; font-size: 1.2rem; border-radius: 5px; margin-bottom: 20px;}
-        .loading-spinner { display: none; }
+        * { box-sizing: border-box; }
+        body {
+            background-color: #0a0a0f;
+            color: #f1f5f9;
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        /* Font rules */
+        h1, h2, h3, h4, h5, h6, .card-header-title, .phase-header, .sidebar-logo {
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e1e2e;
+            border-radius: 2px;
+        }
+
+        /* Main Wrapper */
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header Bar */
+        .header-bar {
+            height: 60px;
+            background-color: #0d0d14;
+            border-bottom: 1px solid #1e1e2e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+        }
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: 0.5px;
+        }
+        .header-subtitle {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin: 2px 0 0 0;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        /* Input / Button styling */
+        .search-input {
+            background-color: #1e1e2e;
+            border: 1px solid #2d2d3d;
+            color: #f1f5f9;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: #6366f1;
+            background-color: #1e1e2e;
+            color: #f1f5f9;
+        }
+        .run-btn {
+            background-color: #ef4444;
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            padding: 8px 18px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        .run-btn:hover {
+            opacity: 0.9;
+        }
+        .run-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Severity Banner */
+        .severity-banner {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            flex-shrink: 0;
+        }
+        .severity-banner.red {
+            background: linear-gradient(90deg, #7f1d1d, #ef4444);
+            color: #ffffff;
+        }
+        .severity-banner.orange {
+            background: linear-gradient(90deg, #78350f, #f59e0b);
+            color: #ffffff;
+        }
+        .severity-banner.yellow {
+            background: linear-gradient(90deg, #713f12, #eab308);
+            color: #000000;
+        }
+
+        /* Content Container */
+        .content-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            min-height: 0;
+        }
+        .left-column {
+            width: 62%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .right-column {
+            width: 38%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            min-height: 0;
+            padding-right: 4px;
+        }
+
+        /* Cards */
+        .nexus-card {
+            background-color: #111118;
+            border: 1px solid #1e1e2e;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: border-color 0.2s;
+        }
+        .nexus-card:hover {
+            border-color: #6366f133;
+        }
+        .card-header-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #64748b;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* Map styling */
+        #map {
+            height: calc(100vh - 220px);
+            border-radius: 8px;
+            border: 1px solid #1e1e2e;
+        }
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+        }
+        .stat-card {
+            flex: 1;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        .stat-value.red {
+            color: #ef4444;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+        .stat-value.blue {
+            color: #6366f1;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Grid requirements */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .resource-box {
+            background-color: #0d0d14;
+            border: 1px solid #1e1e2e;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .resource-label {
+            text-transform: uppercase;
+            font-size: 10px;
+            color: #64748b;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .resource-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #6366f1;
+        }
+
+        /* Timelines / Directives styling */
+        .phase-section {
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+        .phase-section.immediate {
+            border-left: 2px solid #ef4444;
+        }
+        .phase-section.short-term {
+            border-left: 2px solid #f59e0b;
+        }
+        .phase-section.recovery {
+            border-left: 2px solid #22c55e;
+        }
+        
+        .phase-header {
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .phase-header.immediate { color: #ef4444; }
+        .phase-header.short-term { color: #f59e0b; }
+        .phase-header.recovery { color: #22c55e; }
+
+        .directive-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background-color: #0d0d14;
+            border: 1px solid #1e1e2e;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+        }
+        .directive-check {
+            margin-top: 3px;
+            accent-color: #6366f1;
+            cursor: pointer;
+        }
+        .directive-text {
+            color: #e6edf3;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .directive-check:checked + .directive-text {
+            text-decoration: line-through;
+            opacity: 0.4;
+        }
+
+        /* Sitrep Font */
+        .sitrep-body {
+            font-family: monospace;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.8;
+            margin: 0;
+        }
+        .sitrep-timestamp {
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        /* Emergency contacts list */
+        .contacts-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .contact-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #1e1e2e;
+        }
+        .contact-row:last-child {
+            border-bottom: none;
+        }
+        .contact-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .contact-name {
+            color: #e2e8f0;
+            font-size: 13px;
+        }
+        .contact-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-number {
+            color: #64748b;
+            font-size: 12px;
+        }
+        .call-btn {
+            background-color: #16a34a;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 3px 12px;
+            font-size: 12px;
+            text-decoration: none;
+            border: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .call-btn:hover {
+            opacity: 0.9;
+            color: #ffffff;
+        }
+
+        /* Footer styling */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #334155;
+            font-size: 11px;
+            border-top: 1px solid #1e1e2e;
+            margin-top: auto;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+
+        /* Pulsing dot */
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .pulse-dot { width: 10px; height: 10px; background: white; border-radius: 50%; display: inline-block; margin-right: 10px; animation: pulse 1.2s infinite; }
+
+        .loading-spinner {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 220px);
+        }
+
+        @media (max-width: 991px) {
+            body {
+                overflow: auto;
+            }
+            .content-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .left-column, .right-column {
+                width: 100%;
+                height: auto;
+                overflow-y: visible;
+            }
+            #map {
+                height: 400px;
+            }
+        }
+
+        /* Floating Navigation Buttons */
+        .scroll-btn {
+            position: fixed;
+            right: 24px;
+            background-color: #1e1e2e;
+            border: 1px solid #6366f1;
+            color: #6366f1;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, color 0.2s;
+            z-index: 1001;
+        }
+        .scroll-btn:hover {
+            background-color: #6366f1;
+            color: #ffffff;
+        }
+        .scroll-btn-top {
+            bottom: 80px;
+        }
+        .scroll-btn-bottom {
+            bottom: 24px;
+        }
     </style>
 </head>
 <body>
 
-<div class="container-fluid p-4">
-    
-    <!-- HEADER & INPUT SECTION -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <h2 class="text-light">🚨 NEXUS AI Dispatch Engine</h2>
-            <div class="input-group mb-3 mt-3">
-                <input type="text" id="scenarioInput" class="form-control bg-dark text-light" placeholder="Describe the disaster (e.g. Magnitude 7.1 earthquake in Mumbai, flooding on linking road...)">
-                <button class="btn btn-primary" type="button" id="generateBtn" onclick="runSimulation()">Run AI Simulation</button>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="main-wrapper">
+        
+        <!-- HEADER BAR -->
+        <div class="header-bar">
+            <div class="header-left">
+                <h1 class="header-title">NEXUS — Crisis Intelligence Platform</h1>
+                <p class="header-subtitle">AI-Powered Disaster Response</p>
+            </div>
+            <div class="header-right">
+                <input type="text" id="scenarioInput" class="search-input" placeholder="Describe the disaster (e.g. Magnitude 7.1 earthquake in Mumbai, flooding on linking road...)">
+                <button class="run-btn" id="generateBtn" onclick="runSimulation()">Run AI Simulation</button>
             </div>
         </div>
-    </div>
 
-    <!-- DYNAMIC SEVERITY BANNER -->
-    <div class="row">
-        <div class="col-12">
-            <div id="severityBanner" class="severity-banner text-dark"></div>
-        </div>
-    </div>
+        <!-- SEVERITY BANNER -->
+        <div id="severityBanner" class="severity-banner"></div>
 
-    <div class="row">
-        <!-- LEFT COLUMN: MAP -->
-        <div class="col-lg-7">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title text-light mb-3">Geospatial Triage Map</h5>
+        <!-- MAIN LAYOUT -->
+        <div class="content-container">
+            
+            <!-- LEFT COLUMN: MAP -->
+            <div class="left-column">
+                <div class="nexus-card" style="flex: 1; min-height: 0;">
+                    <h5 class="card-header-title">GEOSPATIAL TRIAGE MAP</h5>
+                    
                     <!-- The Loading Spinner -->
                     <div id="loading" class="loading-spinner text-center p-5">
                         <div class="spinner-border text-primary" role="status"></div>
                         <p class="mt-2 text-muted">AI processing logistics and generating coordinates...</p>
                     </div>
+                    
                     <!-- The Map Container -->
-                    <div id="map"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT COLUMN: METRICS & ACTIONS -->
-        <div class="col-lg-5">
-            <!-- Key Metrics (Population & Response Time) -->
-            <div class="row mb-3">
-                <div class="col-6">
-                    <div class="metric-box">
-                        <div class="text-muted small">PEOPLE AFFECTED</div>
-                        <div id="val-population" class="metric-value" style="color: #ff7b72;">--</div>
+                    <div id="map" style="flex: 1;"></div>
+                    
+                    <!-- Map Legend -->
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background-color: #ff4444;"></span>
+                            <span class="text-muted small">High Severity</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background-color: #ff8c00;"></span>
+                            <span class="text-muted small">Medium Severity</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background-color: #ffeb3b;"></span>
+                            <span class="text-muted small">Low Severity</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background-color: #58a6ff;"></span>
+                            <span class="text-muted small">Command Center</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="metric-box">
-                        <div class="text-muted small">EST. RESPONSE TIME</div>
-                        <div id="val-response-time" class="metric-value" style="color: #58a6ff;">--</div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Resource Metrics -->
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title text-light">Resource Requirements</h5>
-                    <div id="resources-container" class="row mt-3">
+            <!-- RIGHT COLUMN: PANELS -->
+            <div class="right-column">
+                
+                <!-- Stat Row -->
+                <div class="stats-row">
+                    <div class="nexus-card stat-card">
+                        <h5 class="card-header-title">PEOPLE AFFECTED</h5>
+                        <div id="val-population" class="stat-value red">--</div>
+                    </div>
+                    <div class="nexus-card stat-card">
+                        <h5 class="card-header-title">EST. RESPONSE TIME</h5>
+                        <div id="val-response-time" class="stat-value blue">--</div>
+                    </div>
+                </div>
+
+                <!-- Resource Requirements -->
+                <div class="nexus-card">
+                    <h5 class="card-header-title">Resource Requirements</h5>
+                    <div id="resources-container" class="resources-grid">
                         <div class="col-12 text-muted text-center py-3">Awaiting simulation...</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Priority Action Timeline -->
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title text-light">Tactical Directives</h5>
-                    <div class="mt-3">
-                        <strong class="text-danger">Immediate (0-2 hrs)</strong>
-                        <ul id="list-immediate" class="text-light"><li>Awaiting simulation...</li></ul>
+                <!-- Tactical Directives -->
+                <div class="nexus-card">
+                    <h5 class="card-header-title">Tactical Directives</h5>
+                    <div class="mt-2">
+                        <div class="phase-section immediate">
+                            <strong class="phase-header immediate">Immediate (0-2 hrs)</strong>
+                            <div id="list-immediate">
+                                <div class="text-muted small">Awaiting simulation...</div>
+                            </div>
+                        </div>
                         
-                        <strong class="text-warning">Short Term (2-12 hrs)</strong>
-                        <ul id="list-short" class="text-light"><li>Awaiting simulation...</li></ul>
+                        <div class="phase-section short-term">
+                            <strong class="phase-header short-term">Short Term (2-12 hrs)</strong>
+                            <div id="list-short">
+                                <div class="text-muted small">Awaiting simulation...</div>
+                            </div>
+                        </div>
                         
-                        <strong class="text-info">Recovery (12-72 hrs)</strong>
-                        <ul id="list-recovery" class="text-light"><li>Awaiting simulation...</li></ul>
+                        <div class="phase-section recovery">
+                            <strong class="phase-header recovery">Recovery (12-72 hrs)</strong>
+                            <div id="list-recovery">
+                                <div class="text-muted small">Awaiting simulation...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Situation Report Panel -->
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title text-light mb-0">Situation Report</h5>
-                        <small id="sitrep-timestamp" class="text-muted small"></small>
-                    </div>
-                    <p id="sitrep-text" style="font-family: monospace; white-space: pre-wrap; font-size: 0.9rem;" class="text-light-50 bg-dark p-3 rounded border border-secondary border-opacity-25 mb-0">Awaiting simulation...</p>
+                <!-- Situation Report -->
+                <div class="nexus-card">
+                    <h5 class="card-header-title">Situation Report</h5>
+                    <div class="sitrep-timestamp" id="sitrep-timestamp"></div>
+                    <p id="sitrep-text" class="sitrep-body"></p>
+                    <p id="sitrep-text-p2" class="sitrep-body"></p>
                 </div>
-            </div>
 
-            <!-- Emergency Contacts Panel -->
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title text-light mb-3">Emergency Contacts</h5>
-                    <div id="contacts-container" class="d-flex flex-column gap-2">
+                <!-- Emergency Contacts -->
+                <div class="nexus-card">
+                    <h5 class="card-header-title">Emergency Contacts</h5>
+                    <div id="contacts-list" class="contacts-list">
                         <div class="text-muted small text-center py-2">Awaiting simulation...</div>
                     </div>
                 </div>
+
             </div>
         </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            NEXUS Crisis Intelligence Platform | Powered by Gemini AI | NDMA Protocol Compliant
+        </div>
     </div>
-</div>
 
 <!-- LEAFLET JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -153,7 +619,7 @@
 
         // Show loading state
         document.getElementById('map').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
+        document.getElementById('loading').style.display = 'flex';
         document.getElementById('generateBtn').disabled = true;
 
         try {
@@ -186,10 +652,18 @@
         // Update Banner
         const banner = document.getElementById('severityBanner');
         banner.style.display = 'block';
-        banner.innerText = data.severity_title;
-        if(data.severity_level === "RED") { banner.style.backgroundColor = "#ff7b72"; banner.style.color = "#000"; }
-        else if(data.severity_level === "ORANGE") { banner.style.backgroundColor = "#d29922"; banner.style.color = "#000"; }
-        else { banner.style.backgroundColor = "#3fb950"; banner.style.color = "#fff"; }
+        if(data.severity_level === "RED") {
+            banner.className = "severity-banner red";
+            banner.innerHTML = '<span class="pulse-dot"></span>' + data.severity_title;
+        }
+        else if(data.severity_level === "ORANGE") {
+            banner.className = "severity-banner orange";
+            banner.innerText = data.severity_title;
+        }
+        else {
+            banner.className = "severity-banner yellow";
+            banner.innerText = data.severity_title;
+        }
 
         // Update Key Metrics (Population & Response Time)
         document.getElementById('val-population').innerText = (data.population_affected || 0).toLocaleString();
@@ -201,27 +675,32 @@
         if (data.resources && data.resources.length > 0) {
             data.resources.forEach(res => {
                 const col = document.createElement('div');
-                col.className = 'col-6 mb-3';
+                col.className = 'resource-box';
                 col.innerHTML = `
-                    <div class="metric-box">
-                        <div class="text-muted small">${res.type.toUpperCase()}</div>
-                        <div class="metric-value">${res.quantity.toLocaleString()}<span style="font-size: 0.95rem; font-weight: normal; margin-left: 4px; color: #8b949e;">${res.unit || ''}</span></div>
-                    </div>
+                    <div class="resource-label">${res.type}</div>
+                    <div class="resource-value">${res.quantity.toLocaleString()}<span style="font-size: 0.95rem; font-weight: normal; margin-left: 4px; color: #64748b;">${res.unit || ''}</span></div>
                 `;
                 resourcesContainer.appendChild(col);
             });
         } else {
-            resourcesContainer.innerHTML = '<div class="col-12 text-muted text-center">No resource requirements generated.</div>';
+            resourcesContainer.innerHTML = '<div class="col-12 text-muted text-center py-3">No resource requirements generated.</div>';
         }
 
         // Helper function to update the lists
         const populateList = (elementId, array) => {
-            const ul = document.getElementById(elementId);
-            ul.innerHTML = '';
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
             if (array && array.length > 0) {
-                array.forEach(item => { ul.innerHTML += `<li>${item}</li>`; });
+                array.forEach(item => {
+                    container.innerHTML += `
+                        <div class="directive-item">
+                            <input type="checkbox" class="directive-check">
+                            <span class="directive-text">${item}</span>
+                        </div>
+                    `;
+                });
             } else {
-                ul.innerHTML = '<li>None</li>';
+                container.innerHTML = '<div class="text-muted small p-2">None</div>';
             }
         };
         populateList('list-immediate', data.ndma_phases.immediate);
@@ -229,51 +708,38 @@
         populateList('list-recovery', data.ndma_phases.recovery);
 
         // Update Situation Report
-        const now = new Date();
-        document.getElementById('sitrep-timestamp').innerText = now.toLocaleTimeString() + ' ' + now.toLocaleDateString();
+        document.getElementById('sitrep-timestamp').innerText = 'Last updated: ' + new Date().toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit'}) + ' IST';
         document.getElementById('sitrep-text').innerText = data.situation_report || "No report available.";
+        document.getElementById('sitrep-text-p2').innerText = data.situation_report_p2 || '';
 
         // Update Emergency Contacts
-        const contactsContainer = document.getElementById('contacts-container');
-        contactsContainer.innerHTML = '';
-        if (data.emergency_contacts && data.emergency_contacts.length > 0) {
-            data.emergency_contacts.forEach(contact => {
-                const row = document.createElement('div');
-                row.className = 'd-flex align-items-center justify-content-between p-2 rounded border border-secondary border-opacity-25 bg-dark';
-                
-                // Determine badge background and color
-                const cat = (contact.category || '').toLowerCase().trim();
-                let badgeStyle = '';
-                if (cat === 'disaster response') {
-                    badgeStyle = 'background-color: #ff7b72; color: #0d1117;';
-                } else if (cat === 'medical') {
-                    badgeStyle = 'background-color: #3fb950; color: #0d1117;';
-                } else if (cat === 'emergency') {
-                    badgeStyle = 'background-color: #d29922; color: #0d1117;';
-                } else {
-                    badgeStyle = 'background-color: #8b949e; color: #0d1117;';
-                }
-                
-                row.innerHTML = `
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge px-2 py-1" style="${badgeStyle} font-size: 0.75rem; text-transform: uppercase;">${contact.category || 'General'}</span>
-                        <div>
-                            <strong class="d-block text-light" style="font-size: 0.9rem;">${contact.name}</strong>
-                            <span class="text-muted small">${contact.number}</span>
-                        </div>
-                    </div>
-                    <a href="tel:${contact.number}" class="btn btn-sm btn-success px-3 d-flex align-items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-telephone-fill" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
-                        </svg>
-                        Call
-                    </a>
-                `;
-                contactsContainer.appendChild(row);
-            });
-        } else {
-            contactsContainer.innerHTML = '<div class="text-muted small text-center py-2">No emergency contacts listed</div>';
+        function renderContacts(contacts) {
+            const container = document.getElementById('contacts-list');
+            container.innerHTML = '';
+            if (contacts && contacts.length > 0) {
+                contacts.forEach(c => {
+                    const badgeColor = 
+                        c.category.includes('Disaster') ? '#ef4444' :
+                        c.category.includes('Medical') || c.category.includes('Search') ? '#22c55e' :
+                        c.category.includes('Emergency') || c.category.includes('Police') ? '#f59e0b' : '#64748b';
+                    container.innerHTML += `
+                        <div class="contact-row">
+                            <div class="contact-left">
+                                <span class="contact-badge" style="background:${badgeColor}33; color:${badgeColor};">${c.category}</span>
+                                <span class="contact-name">${c.name}</span>
+                            </div>
+                            <div class="contact-right">
+                                <span class="contact-number">${c.number}</span>
+                                <a href="tel:${c.number}" class="call-btn">Call</a>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                container.innerHTML = '<div class="text-muted small text-center py-2">No emergency contacts listed</div>';
+            }
         }
+
+        renderContacts(data.emergency_contacts || []);
 
         // Update Map
         updateMap(data.incident_location, data.map_pins);
@@ -314,7 +780,6 @@
         });
 
         // The Heatmap Cheat: Generate fake coordinate spread around center
-        //dont wanna add it honestly but i think its necessary
         let heatPoints = [];
         for(let i=0; i<150; i++) {
             // Add slight random offset to lat/lng to create a blob
@@ -331,6 +796,27 @@
             gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1.0: 'red'}
         }).addTo(map);
     }
+
+    function scrollToTop() {
+        const rightCol = document.querySelector('.right-column');
+        if (rightCol && (rightCol.scrollHeight > rightCol.clientHeight)) {
+            rightCol.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function scrollToBottom() {
+        const rightCol = document.querySelector('.right-column');
+        if (rightCol && (rightCol.scrollHeight > rightCol.clientHeight)) {
+            rightCol.scrollTo({ top: rightCol.scrollHeight, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+    }
 </script>
+    <!-- Floating Navigation Buttons -->
+    <button class="scroll-btn scroll-btn-top" onclick="scrollToTop()">↑</button>
+    <button class="scroll-btn scroll-btn-bottom" onclick="scrollToBottom()">↓</button>
 </body>
 </html>

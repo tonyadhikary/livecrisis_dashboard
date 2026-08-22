@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 backend/.env
 __pycache__/
+=======
+backend/.env
+__pycache__/
+>>>>>>> 9589ca86d52acbf1f3293bedbd7d4c11503eb453
 *.pyc
