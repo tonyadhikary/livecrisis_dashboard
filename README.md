@@ -134,7 +134,7 @@ Built in an overnight sprint for the 2026 Craft N Code Hackathon.
 
 Team Name: Team Name
 
-Members: Alakh, Karthik, Pranshu, Tanmay
+Members: Alakh, Karthik, Pranshu, Tanmay.
 
 Repository: [livecrisis_dashboard](github.com/tonyadhikary/livecrisis_dashboard)
 
