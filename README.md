@@ -28,7 +28,7 @@ A coordinator inputs an unstructured incident scenario, and the engine dynamical
 
 * **The Bottleneck:** During the "Golden Hour" following a natural disaster, relief coordinators lose critical hours manually aggregating damage reports, extracting coordinates, and establishing communication trees.
 * **The Reality:** The first 6 hours dictate survival rates, but conventional field assessment takes 24–72 hours.
-* **The NEXUS Solution:** Replaces hours of manual triage with a single structured simulation engine. **This is decision infrastructure, not a chatbot.**
+* **The Solution:** Replaces hours of manual triage with a single structured simulation engine. **This is decision infrastructure, not a chatbot.**
 
 ---
 
@@ -66,8 +66,8 @@ A coordinator inputs an unstructured incident scenario, and the engine dynamical
 | :--- | :--- | :--- |
 | **Frontend** | HTML5, Vanilla JavaScript, CSS3 | Single-file, zero-build lightweight frontend |
 | **Styling** | Bootstrap 5.3 (Dark Theme) + Custom CSS | High-contrast command center UI |
-| **Mapping Engine**| Leaflet.js (CDN) + Leaflet.heat | Dynamic tile rendering and geospatial heatmap clustering[cite: 1] |
-| **Backend** | Python 3 + Flask + Flask-CORS | REST API handling prompt orchestration & parsing[cite: 1] |
+| **Mapping Engine**| Leaflet.js (CDN) + Leaflet.heat | Dynamic tile rendering and geospatial heatmap clustering |
+| **Backend** | Python 3 + Flask + Flask-CORS | REST API handling prompt orchestration & parsing |
 | **AI Intelligence**| Google Gemini API (`gemini-2.5-flash`) | Rapid spatial deduction and structured JSON triage generation |
 
 ---
