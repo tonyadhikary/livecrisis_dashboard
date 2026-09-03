@@ -136,5 +136,5 @@ Team Name: Team Name
 
 Members: Alakh, Karthik, Pranshu, Tanmay.
 
-Repository: [livecrisis_dashboard](github.com/tonyadhikary/livecrisis_dashboard)
+
 
