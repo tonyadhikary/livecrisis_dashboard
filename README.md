@@ -128,13 +128,5 @@ python -m http.server 3000
 
 [ ] Automated PDF SITREP Export: One-click dispatch brief generator for field commanders.
 
-👥 Team
-
-Built in an overnight sprint for the 2026 Craft N Code Hackathon.
-
-Team Name: Team Name
-
-Members: Alakh, Karthik, Pranshu, Tanmay.
-
 
 
